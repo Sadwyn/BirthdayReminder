@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
 
 import com.sadwyn.institute.birthdayreminder.contentprovider.MyContentProvider;
 import com.sadwyn.institute.birthdayreminder.data.Person;
@@ -25,17 +27,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class AlarmService extends IntentService {
-    public AlarmService() {
-        super("AlarmService");
-    }
+public class AlarmService extends JobIntentService {
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleWork(@NonNull Intent intent) {
         Cursor c = getContentResolver().query(MyContentProvider.PEOPLE_CONTENT_URI, null,null,null, null);
         List<Person> people = getPeople(c);
-
-
 
 
         for (Person person : people) {
