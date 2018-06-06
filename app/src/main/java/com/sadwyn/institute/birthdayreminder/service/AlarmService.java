@@ -26,12 +26,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-public class AlarmService extends JobIntentService {
+public class AlarmService extends IntentService {
+    public AlarmService() {
+        super("service");
+    }
 
     @Override
-    protected void onHandleWork(@NonNull Intent intent) {
-        Cursor c = getContentResolver().query(MyContentProvider.PEOPLE_CONTENT_URI, null,null,null, null);
+    protected void onHandleIntent(@NonNull Intent intent) {
+        Cursor c = getContentResolver().query(MyContentProvider.PEOPLE_CONTENT_URI, null, null, null, null);
         List<Person> people = getPeople(c);
 
 
@@ -42,12 +46,11 @@ public class AlarmService extends JobIntentService {
 
 
             Calendar currentDate = Calendar.getInstance();
-            currentDate.set(Calendar.DAY_OF_YEAR, birthDateCalendar.get(Calendar.DAY_OF_YEAR));
+
             currentDate.set(Calendar.MONTH, birthDateCalendar.get(Calendar.MONTH));
+            currentDate.set(Calendar.DAY_OF_YEAR, birthDateCalendar.get(Calendar.DAY_OF_YEAR));
             currentDate.add(Calendar.DAY_OF_YEAR, -7);
 
-            Calendar testCalendaar = Calendar.getInstance();
-            testCalendaar.add(Calendar.SECOND, 10);
 
             ComponentName receiver = new ComponentName(getApplicationContext(), AlarmReceiver.class);
             PackageManager pm = getApplicationContext().getPackageManager();
@@ -59,14 +62,15 @@ public class AlarmService extends JobIntentService {
             Intent receiverIntent = new Intent(this, NotificationReceiver.class);
             NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
             Notification notification = notificationHelper.createNotification("7 дней до дня рождения", person.getLastName() + " " + person.getFirstName() +
-                    " " + person.getPatronymic());
+                    " " + person.getPatronymic() + ", " + "Исполняется " + getDateDiff(formatDate(new Date()), person.getBirthDate()) + " лет");
             receiverIntent.putExtra("notification", notification);
             receiverIntent.putExtra("id", person.getId());
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, person.getId(), receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            AlarmManager manager = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-            manager.set(AlarmManager.RTC_WAKEUP, currentDate.getTimeInMillis(), pendingIntent);
+            AlarmManager manager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            if(birthDateCalendar.compareTo(currentDate) >= 0)
+                manager.set(AlarmManager.RTC_WAKEUP, currentDate.getTimeInMillis(), pendingIntent);
         }
     }
 
@@ -78,6 +82,7 @@ public class AlarmService extends JobIntentService {
             int lastNameColIndex = c.getColumnIndex("lastName");
             int patronymicIndex = c.getColumnIndex("patronymic");
             int birthDateIndex = c.getColumnIndex("birthDate");
+            int phoneIndex = c.getColumnIndex("phone");
             do {
                 Person person = new Person();
                 person.setId(c.getInt(idColIndex));
@@ -85,6 +90,7 @@ public class AlarmService extends JobIntentService {
                 person.setLastName(c.getString(lastNameColIndex));
                 person.setPatronymic(c.getString(patronymicIndex));
                 person.setBirthDate(c.getString(birthDateIndex));
+                person.setPhone(c.getString(phoneIndex));
                 people.add(person);
             }
             while (c.moveToNext());
@@ -94,7 +100,7 @@ public class AlarmService extends JobIntentService {
         return Collections.emptyList();
     }
 
-    private Date parseDate(String date){
+    private Date parseDate(String date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
 
         Date birthDate = null;
@@ -104,5 +110,16 @@ public class AlarmService extends JobIntentService {
             e.printStackTrace();
         }
         return birthDate;
+    }
+
+    private String formatDate(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        return dateFormat.format(date);
+    }
+
+    private int getDateDiff(String date, String date2) {
+        String[] date1Array = date.split("\\.");
+        String[] date2Array = date2.split("\\.");
+        return Math.abs(Integer.parseInt(date1Array[2]) - Integer.parseInt(date2Array[2]));
     }
 }

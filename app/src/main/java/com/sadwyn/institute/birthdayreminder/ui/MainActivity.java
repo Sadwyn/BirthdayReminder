@@ -1,31 +1,26 @@
 package com.sadwyn.institute.birthdayreminder.ui;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.sadwyn.institute.birthdayreminder.contentprovider.MyContentProvider;
-import com.sadwyn.institute.birthdayreminder.data.PersonEnum;
 import com.sadwyn.institute.birthdayreminder.R;
+import com.sadwyn.institute.birthdayreminder.contentprovider.MyContentProvider;
 import com.sadwyn.institute.birthdayreminder.data.DBHelper;
 import com.sadwyn.institute.birthdayreminder.data.Person;
+import com.sadwyn.institute.birthdayreminder.data.PersonEnum;
 import com.sadwyn.institute.birthdayreminder.service.AlarmService;
-import com.sadwyn.institute.birthdayreminder.util.NotificationHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PeopleAdapter.OnPersonClickListener {
     private RecyclerView peopleListRecycler;
     private DBHelper dbHelper;
 
@@ -33,20 +28,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Главная");
         dbHelper = new DBHelper(getApplicationContext());
         if (!dbHelper.doesDatabaseExist(getApplicationContext(), DBHelper.PEOPLE_DB)) {
             fillDefaultDataBase();
         }
 
         peopleListRecycler = findViewById(R.id.personListRecycler);
-        PeopleAdapter adapter = new PeopleAdapter();
+        PeopleAdapter adapter = new PeopleAdapter(this);
         LinearLayoutManager manager = new LinearLayoutManager(this);
         peopleListRecycler.setLayoutManager(manager);
         peopleListRecycler.setAdapter(adapter);
         adapter.setPeople(getPersonsFromDB());
         adapter.notifyDataSetChanged();
         startService(new Intent(this, AlarmService.class));
-
     }
 
     public void fillDefaultDataBase() {
@@ -57,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
             cv.put("lastName", person.getLastName());
             cv.put("patronymic", person.getPatronymic());
             cv.put("birthDate", person.getBirthDate());
+            cv.put("phone", person.getPhoneNumber());
             long rowID = database.insert(DBHelper.PEOPLE_TABLE, null, cv);
             Log.d(this.getClass().getSimpleName(), "row inserted, ID = " + rowID);
         }
@@ -74,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             int lastNameColIndex = c.getColumnIndex("lastName");
             int patronymicIndex = c.getColumnIndex("patronymic");
             int birthDateIndex = c.getColumnIndex("birthDate");
+            int phoneIndex = c.getColumnIndex("phone");
             do {
                 Person person = new Person();
                 person.setId(c.getInt(idColIndex));
@@ -81,11 +78,19 @@ public class MainActivity extends AppCompatActivity {
                 person.setLastName(c.getString(lastNameColIndex));
                 person.setPatronymic(c.getString(patronymicIndex));
                 person.setBirthDate(c.getString(birthDateIndex));
+                person.setPhone(c.getString(phoneIndex));
                 people.add(person);
             }
             while (c.moveToNext());
             c.close();
         }
         return people;
+    }
+
+    @Override
+    public void onPersonClick(Person person) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("person", person);
+        startActivity(intent);
     }
 }

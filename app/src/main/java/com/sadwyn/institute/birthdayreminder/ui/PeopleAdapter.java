@@ -1,5 +1,6 @@
 package com.sadwyn.institute.birthdayreminder.ui;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
@@ -18,9 +19,19 @@ import java.util.List;
 
 public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.PersonViewHolder> {
     private List<Person> people = new ArrayList<>();
+    private OnPersonClickListener onPersonClickListener;
 
     public void setPeople(List<Person> people) {
         this.people = people;
+    }
+
+    public PeopleAdapter(Context context) {
+        if (context instanceof OnPersonClickListener) {
+            onPersonClickListener = (OnPersonClickListener) context;
+        }
+        else {
+            throw new ClassCastException("instance of class is not implementing " + OnPersonClickListener.class.getSimpleName());
+        }
     }
 
     @NonNull
@@ -33,9 +44,10 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.PersonView
     @Override
     public void onBindViewHolder(@NonNull PeopleAdapter.PersonViewHolder holder, int position) {
         String firstName = people.get(position).getFirstName();
-        String lastName = people.get(position).getPatronymic();
-        if (!TextUtils.isEmpty(firstName) && !TextUtils.isEmpty(lastName)) {
-            holder.name.setText(String.format("%s   %s", firstName, lastName));
+        String patronymic = people.get(position).getPatronymic();
+        String lastName = people.get(position).getLastName();
+        if (!TextUtils.isEmpty(firstName) && !TextUtils.isEmpty(lastName) && !TextUtils.isEmpty(patronymic)) {
+            holder.name.setText(String.format("%s %s %s", firstName, patronymic, lastName));
         }
     }
 
@@ -45,7 +57,7 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.PersonView
     }
 
 
-    class PersonViewHolder extends RecyclerView.ViewHolder {
+    class PersonViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ConstraintLayout root;
         CardView cardView;
         TextView name;
@@ -55,6 +67,16 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.PersonView
             root = itemView.findViewById(R.id.peopleHolder);
             cardView = itemView.findViewById(R.id.cardView);
             name = itemView.findViewById(R.id.tvName);
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            onPersonClickListener.onPersonClick(people.get(getAdapterPosition()));
+        }
+    }
+
+    interface OnPersonClickListener {
+        void onPersonClick(Person person);
     }
 }

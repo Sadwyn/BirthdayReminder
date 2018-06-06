@@ -19,6 +19,7 @@
         android:layout_marginTop="8dp"
         card_view:cardCornerRadius="6dp"
         card_view:contentPadding="15dp"
+        android:foreground="?android:attr/selectableItemBackground"
         card_view:layout_constraintBottom_toBottomOf="parent"
         card_view:layout_constraintEnd_toEndOf="parent"
         card_view:layout_constraintHorizontal_bias="0.0"

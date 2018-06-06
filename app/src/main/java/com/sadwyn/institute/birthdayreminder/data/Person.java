@@ -8,6 +8,7 @@ public class Person implements Serializable {
     private String lastName;
     private String patronymic;
     private String birthDate;
+    private String phone;
 
 
     public int getId() {
@@ -48,5 +49,13 @@ public class Person implements Serializable {
 
     public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

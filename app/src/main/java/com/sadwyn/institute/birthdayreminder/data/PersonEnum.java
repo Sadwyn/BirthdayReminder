@@ -14,7 +14,7 @@ public enum PersonEnum {
     CHUMACHENKO_DARIA_OLEKSANDROVNA("Дарья", "Олександровна", "Чумаченко", "20.02.1988", "0682544957"),
     SHVEC_NATALIA_VICTOTOVNA("Наталия", "Викторовна", "Швец", "06.01.1960", "0679476553"),
     ANTONOVA_ALFIA_RAISOVNA("Альфия", "Раисовна", "Антонова", "09.07.1962", "0679824034"),
-    BODYUL_ELENA_STANISLAVOVNA("Елена","Станиславовна", "Бодюл", "23.07.1997", "0931371638"),
+    BODYUL_ELENA_STANISLAVOVNA("Елена","Станиславовна", "Бодюл", "23.07.1977", "0931371638"),
     ILYASHCHUK_YULIA_OLEGOVNA("Юлия", "Олеговна", "Ильящук", "24.07.1979", "0937065545"),
     BARKAR_STELLA_OLEGOVNA("Баркар", "Стелла", "Олеговна", "29.08.1966", "0632341202");
 
@@ -29,6 +29,7 @@ public enum PersonEnum {
         this.lastName = lastName;
         this.patronymic = patronymic;
         this.birthDate = birthDate;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getFirstName() {
