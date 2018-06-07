@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
 
     <application
         android:allowBackup="false"
@@ -53,9 +54,9 @@
         <receiver
             android:name=".receiver.NotificationReceiver"
             android:enabled="true"
-            android:exported="false"></receiver>
+            android:exported="false"/>
 
-        <activity android:name=".ui.DetailActivity"></activity>
+        <activity android:name=".ui.DetailActivity"/>
     </application>
 
 </manifest>

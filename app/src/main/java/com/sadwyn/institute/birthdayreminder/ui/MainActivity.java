@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.JobIntentService;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements PeopleAdapter.OnP
         peopleListRecycler.setAdapter(adapter);
         adapter.setPeople(getPersonsFromDB());
         adapter.notifyDataSetChanged();
-        startService(new Intent(this, AlarmService.class));
+        JobIntentService.enqueueWork(getApplicationContext(), AlarmService.class, 666, new Intent());
     }
 
     public void fillDefaultDataBase() {

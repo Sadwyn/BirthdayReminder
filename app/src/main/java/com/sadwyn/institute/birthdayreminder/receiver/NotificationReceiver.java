@@ -1,34 +1,45 @@
 package com.sadwyn.institute.birthdayreminder.receiver;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
-import com.sadwyn.institute.birthdayreminder.R;
 import com.sadwyn.institute.birthdayreminder.util.NotificationHelper;
 
-public class NotificationReceiver extends BroadcastReceiver {
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
-    public static final String FIRST_NAME = "firstName";
-    public static final String LAST_NAME = "lastName";
-    public static final String PATRONYMIC = "patronymic";
+public class NotificationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
-        Notification notification = extras.getParcelable("notification");
+
         int id = extras.getInt("id");
+        String fullName = extras.getString("fullName");
+        String birthDate = extras.getString("birthDate");
 
-       NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-       manager.notify(id, notification);
+        NotificationHelper notificationHelper = new NotificationHelper(context.getApplicationContext());
+        Notification notification = notificationHelper.createNotification("7 дней до дня рождения", fullName + ", " + "Исполняется " +
+                getDateDiff(formatDate(new Date()), birthDate) + " лет");
 
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+        manager.notify(id, notification);
+    }
+
+    private String formatDate(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        return dateFormat.format(date);
+    }
+
+    private int getDateDiff(String date, String date2) {
+        String[] date1Array = date.split("\\.");
+        String[] date2Array = date2.split("\\.");
+        return Math.abs(Integer.parseInt(date1Array[2]) - Integer.parseInt(date2Array[2]));
     }
 }

@@ -28,28 +28,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class AlarmService extends IntentService {
-    public AlarmService() {
-        super("service");
-    }
+public class AlarmService extends JobIntentService {
+
 
     @Override
-    protected void onHandleIntent(@NonNull Intent intent) {
+    protected void onHandleWork(@NonNull Intent intent) {
         Cursor c = getContentResolver().query(MyContentProvider.PEOPLE_CONTENT_URI, null, null, null, null);
         List<Person> people = getPeople(c);
 
 
         for (Person person : people) {
             Date birthDate = parseDate(person.getBirthDate());
-            Calendar birthDateCalendar = Calendar.getInstance();
-            birthDateCalendar.setTime(birthDate);
-
 
             Calendar currentDate = Calendar.getInstance();
-
-            currentDate.set(Calendar.MONTH, birthDateCalendar.get(Calendar.MONTH));
-            currentDate.set(Calendar.DAY_OF_YEAR, birthDateCalendar.get(Calendar.DAY_OF_YEAR));
-            currentDate.add(Calendar.DAY_OF_YEAR, -7);
+            Calendar birthDateCalendar = Calendar.getInstance();
+            birthDateCalendar.setTime(birthDate);
+            birthDateCalendar.set(Calendar.YEAR, currentDate.get(Calendar.YEAR));
+            birthDateCalendar.add(Calendar.DAY_OF_YEAR, -7);
 
 
             ComponentName receiver = new ComponentName(getApplicationContext(), AlarmReceiver.class);
@@ -60,17 +55,22 @@ public class AlarmService extends IntentService {
 
 
             Intent receiverIntent = new Intent(this, NotificationReceiver.class);
-            NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-            Notification notification = notificationHelper.createNotification("7 дней до дня рождения", person.getLastName() + " " + person.getFirstName() +
-                    " " + person.getPatronymic() + ", " + "Исполняется " + getDateDiff(formatDate(new Date()), person.getBirthDate()) + " лет");
-            receiverIntent.putExtra("notification", notification);
+
+            receiverIntent.putExtra("fullName", person.getLastName() + " " + person.getFirstName() + " " + person.getPatronymic());
+            receiverIntent.putExtra("birthDate", person.getBirthDate());
             receiverIntent.putExtra("id", person.getId());
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, person.getId(), receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+            long millisOfYear = (long) 1000 * 60 * 60 * 24 * 365;
+
             AlarmManager manager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-            if(birthDateCalendar.compareTo(currentDate) >= 0)
-                manager.set(AlarmManager.RTC_WAKEUP, currentDate.getTimeInMillis(), pendingIntent);
+
+            assert manager != null;
+            if (currentDate.after(birthDateCalendar)) {
+                birthDateCalendar.add(Calendar.YEAR, 1);
+            }
+            manager.setRepeating(AlarmManager.RTC_WAKEUP, birthDateCalendar.getTimeInMillis(), millisOfYear, pendingIntent);
         }
     }
 
@@ -110,16 +110,5 @@ public class AlarmService extends IntentService {
             e.printStackTrace();
         }
         return birthDate;
-    }
-
-    private String formatDate(Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        return dateFormat.format(date);
-    }
-
-    private int getDateDiff(String date, String date2) {
-        String[] date1Array = date.split("\\.");
-        String[] date2Array = date2.split("\\.");
-        return Math.abs(Integer.parseInt(date1Array[2]) - Integer.parseInt(date2Array[2]));
     }
 }

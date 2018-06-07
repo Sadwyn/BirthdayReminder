@@ -47,7 +47,7 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.PersonView
         String patronymic = people.get(position).getPatronymic();
         String lastName = people.get(position).getLastName();
         if (!TextUtils.isEmpty(firstName) && !TextUtils.isEmpty(lastName) && !TextUtils.isEmpty(patronymic)) {
-            holder.name.setText(String.format("%s %s %s", firstName, patronymic, lastName));
+            holder.name.setText(String.format("%s %s %s", lastName, firstName, patronymic));
         }
     }
 
