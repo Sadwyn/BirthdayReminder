@@ -1,7 +1,9 @@
 package com.sadwyn.institute.birthdayreminder.ui;
 
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import com.sadwyn.institute.birthdayreminder.contentprovider.MyContentProvider;
 import com.sadwyn.institute.birthdayreminder.data.DBHelper;
 import com.sadwyn.institute.birthdayreminder.data.Person;
 import com.sadwyn.institute.birthdayreminder.data.PersonEnum;
+import com.sadwyn.institute.birthdayreminder.receiver.AlarmReceiver;
 import com.sadwyn.institute.birthdayreminder.service.AlarmService;
 
 import java.util.ArrayList;
@@ -43,6 +46,13 @@ public class MainActivity extends AppCompatActivity implements PeopleAdapter.OnP
         adapter.setPeople(getPersonsFromDB());
         adapter.notifyDataSetChanged();
         JobIntentService.enqueueWork(getApplicationContext(), AlarmService.class, 666, new Intent());
+
+        ComponentName receiver = new ComponentName(getApplicationContext(), AlarmReceiver.class);
+        PackageManager pm = getApplicationContext().getPackageManager();
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+
     }
 
     public void fillDefaultDataBase() {

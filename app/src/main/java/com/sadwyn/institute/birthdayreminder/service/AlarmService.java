@@ -46,14 +46,6 @@ public class AlarmService extends JobIntentService {
             birthDateCalendar.set(Calendar.YEAR, currentDate.get(Calendar.YEAR));
             birthDateCalendar.add(Calendar.DAY_OF_YEAR, -7);
 
-
-            ComponentName receiver = new ComponentName(getApplicationContext(), AlarmReceiver.class);
-            PackageManager pm = getApplicationContext().getPackageManager();
-            pm.setComponentEnabledSetting(receiver,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP);
-
-
             Intent receiverIntent = new Intent(this, NotificationReceiver.class);
 
             receiverIntent.putExtra("fullName", person.getLastName() + " " + person.getFirstName() + " " + person.getPatronymic());
