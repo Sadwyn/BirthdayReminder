@@ -49,7 +49,7 @@ public class AddPersonPresenter extends BasePresenter<AddPersonView> {
                 .doOnNext(this::validate)
                 .toMap(Map.Entry::getKey, Map.Entry::getValue)
                 .flatMap(this::addPersonToTable)
-                .subscribe());
+                .subscribe(o -> view.onPersonSaved()));
 
     }
 
