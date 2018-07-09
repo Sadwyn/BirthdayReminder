@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.DetailActivity">
+    tools:context=".ui.fragment.DetailFragment">
 
     <TextView
         android:id="@+id/firstName"
@@ -24,12 +24,12 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         tools:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/patronymic"
+        app:layout_constraintBottom_toTopOf="@+id/et_patronymic"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/firstName" />
 
     <TextView
-        android:id="@+id/patronymic"
+        android:id="@+id/et_patronymic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
@@ -48,7 +48,7 @@
         tools:text="TextView"
         app:layout_constraintBottom_toTopOf="@+id/phoneNumber"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/patronymic" />
+        app:layout_constraintTop_toBottomOf="@+id/et_patronymic" />
 
     <Button
         android:id="@+id/phoneNumber"

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">BirthdayReminder</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="users_list">Список именинников</string>
+    <string name="add_user">Добавить</string>
+    <string name="open_drawer">openDrawer</string>
+    <string name="close_drawer">closeDrawer</string>
 </resources>

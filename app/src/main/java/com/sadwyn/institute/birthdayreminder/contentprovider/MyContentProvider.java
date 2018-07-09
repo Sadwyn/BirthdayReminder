@@ -1,6 +1,7 @@
 package com.sadwyn.institute.birthdayreminder.contentprovider;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,8 +31,11 @@ public class MyContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        // TODO: Implement this to handle requests to insert a new row.
-        throw new UnsupportedOperationException("Not yet implemented");
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long rowId = db.insert(DBHelper.PEOPLE_TABLE, null, values);
+        Uri resultUri = ContentUris.withAppendedId(PEOPLE_CONTENT_URI, rowId);
+        getContext().getContentResolver().notifyChange(resultUri, null);
+        return resultUri;
     }
 
     @Override

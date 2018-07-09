@@ -10,7 +10,8 @@ import java.io.File;
 public class DBHelper extends SQLiteOpenHelper {
 
     public static final String PEOPLE_TABLE = "people";
-    private static final String CREATE_TABLE_SQL_QUERY = "create table " + PEOPLE_TABLE + " (" + "id integer primary key autoincrement," + "firstName text," + "lastName text,"
+    private static final String CREATE_TABLE_SQL_QUERY = "create table " + PEOPLE_TABLE + " " +
+            "(" + "id integer primary key autoincrement," + "firstName text," + "lastName text,"
             + "patronymic text," + "birthDate text," + "phone text" + ");";
     public static final String PEOPLE_DB = "reminderDb";
 

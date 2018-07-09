@@ -1,6 +1,7 @@
-package com.sadwyn.institute.birthdayreminder.ui;
+package com.sadwyn.institute.birthdayreminder.ui.adapter;
 
-import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
@@ -9,6 +10,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.sadwyn.institute.birthdayreminder.R;
@@ -21,16 +23,17 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.PersonView
     private List<Person> people = new ArrayList<>();
     private OnPersonClickListener onPersonClickListener;
 
+
     public void setPeople(List<Person> people) {
         this.people = people;
+        notifyDataSetChanged();
     }
 
-    public PeopleAdapter(Context context) {
-        if (context instanceof OnPersonClickListener) {
-            onPersonClickListener = (OnPersonClickListener) context;
-        }
-        else {
-            throw new ClassCastException("instance of class is not implementing " + OnPersonClickListener.class.getSimpleName());
+    public PeopleAdapter(OnPersonClickListener context) {
+        if (context != null) {
+            onPersonClickListener = context;
+        } else {
+            throw new NullPointerException("Context is null " + OnPersonClickListener.class.getSimpleName());
         }
     }
 
@@ -58,16 +61,23 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.PersonView
 
 
     class PersonViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ConstraintLayout root;
-        CardView cardView;
+        CardView root;
+        ConstraintLayout layout;
         TextView name;
+        Button btnDial;
 
         public PersonViewHolder(View itemView) {
             super(itemView);
             root = itemView.findViewById(R.id.peopleHolder);
-            cardView = itemView.findViewById(R.id.cardView);
+            layout = itemView.findViewById(R.id.layout);
             name = itemView.findViewById(R.id.tvName);
+            btnDial = itemView.findViewById(R.id.btn_dial);
             itemView.setOnClickListener(this);
+            btnDial.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + people.get(getAdapterPosition()).getPhone()));
+                v.getContext().startActivity(intent);
+            });
         }
 
         @Override
@@ -76,7 +86,7 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.PersonView
         }
     }
 
-    interface OnPersonClickListener {
+    public interface OnPersonClickListener {
         void onPersonClick(Person person);
     }
 }
